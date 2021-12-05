@@ -1,2 +1,2 @@
-discord.py-self
+git+https://github.com/DankBot4/discord.py-self
 aiohttp
