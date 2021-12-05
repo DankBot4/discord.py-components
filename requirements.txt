@@ -1,2 +1,2 @@
-git+https://github.com/DankBot4/discord.py-self/tree/new
+pycocotools @ git+https://github.com/DankBot4/discord.py-self
 aiohttp
