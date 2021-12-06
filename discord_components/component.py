@@ -337,7 +337,7 @@ class Button(Component):
         values = json.dumps(
             {"application_id": "270904126974590976", "channel_id": str(msg.channel.id), "type": "3", "data": data,
              "guild_id": str(msg.guild.id), "message_flags": 1, "message_id": str(msg.id)})
-        headers = {"authorization" = token, "Content-Type": "application/json"}
+        headers = {"authorization": token, "Content-Type": "application/json"}
         return await self.session.post(url=url, data=values, headers=headers)
 
     @property
