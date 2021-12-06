@@ -1,2 +1,2 @@
-discord @ git+https://github.com/DankBot4/discord.py-self/tree/new
+git+https://github.com/DankBot4/discord.py-self@new
 aiohttp
