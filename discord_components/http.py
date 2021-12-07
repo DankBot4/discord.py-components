@@ -52,10 +52,3 @@ class HTTPClient:
                 route,
                 json=data,
             )
-    def click_button(self, msg: Message, button: Button):
-        route = Route("POST", 'interactions/')
-        data = {"component_type": 2, "custom_id": str(button.id)}
-        values = {"application_id": "270904126974590976", "channel_id": str(msg.channel.id), "type": "3", "data": data,
-             "guild_id": str(msg.guild.id), "message_flags": 1, "message_id": str(msg.id)}
-
-        return self.bot.http.request(route, json=values)
