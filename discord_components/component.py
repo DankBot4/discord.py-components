@@ -331,16 +331,6 @@ class Button(Component):
             data["emoji"] = self.emoji.to_dict()
         return data
     
-    async def click(self, msg, token):
-        url = "https://discord.com/api/v9/interactions"
-
-        data = {"component_type": 2, "custom_id": str(self.id)}
-        values = json.dumps(
-            {"application_id": "270904126974590976", "channel_id": str(msg.channel.id), "type": "3", "data": data,
-             "guild_id": str(msg.guild.id), "message_flags": 1, "message_id": str(msg.id)})
-        headers = {"authorization": token, "Content-Type": "application/json"}
-        return await self.session.post(url=url, data=values, headers=headers)
-
     @property
     def style(self) -> int:
         return self._style
