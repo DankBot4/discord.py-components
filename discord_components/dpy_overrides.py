@@ -49,7 +49,7 @@ class ComponentMessage(Message):
         if component is None:
             raise LookupError("Component not found")
         if  isinstance(component, Button):
-            return await self._state.click_button(self, component)
+            return await self._state.http.click_button(self, component)
         else:
             raise TypeError(f"{component} is not a button")
 
