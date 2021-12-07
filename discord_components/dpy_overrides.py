@@ -14,7 +14,7 @@ from discord.abc import Messageable, Snowflake
 from discord.ext.commands import Context
 
 from .utils import _get_components_json, _form_files
-from .component import _get_component_type, ActionRow, Component
+from .component import _get_component_type, ActionRow, Component, Button
 
 __all__ = ("ComponentMessage",)
 
@@ -43,6 +43,15 @@ class ComponentMessage(Message):
         await self.edit(
             components=[row.disable_components() for row in self.components],
         )
+
+    async def click_component(self, custom_id: str) -> None:
+        component = self.get_component(custom_id)
+        if component is None:
+            raise LookupError("Component not found")
+        if  isinstance(component, Button):
+            return await self._state.click_button(self, component)
+        else:
+            raise TypeError(f"{component} is not a button")
 
     async def edit(
         self,
