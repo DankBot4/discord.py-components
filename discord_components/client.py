@@ -38,7 +38,7 @@ class DiscordComponents:
     async def on_socket_response(self, res):
         if res.get('d') is None:
             return
-        if ['d'].get('type') is None:
+        if res['d'].get('type') is None:
             return
         if (res["t"] != "INTERACTION_CREATE") or (res["d"]["type"] != 3):
             return
