@@ -14,7 +14,14 @@ from discord.abc import Messageable, Snowflake
 from discord.ext.commands import Context
 
 from .utils import _get_components_json, _form_files
-from .component import _get_component_type, ActionRow, Component, Button
+from .component import (
+    Select,
+    SelectOption,
+    _get_component_type,
+    ActionRow,
+    Component,
+    Button,
+)
 
 __all__ = ("ComponentMessage",)
 
@@ -48,10 +55,13 @@ class ComponentMessage(Message):
         component = self.get_component(custom_id)
         if component is None:
             raise LookupError("Component not found")
-        if  isinstance(component, Button):
+        if isinstance(component, Button):
             return await self._state.http.click_button(self, component)
         else:
             raise TypeError(f"{component} is not a button")
+
+    async def select_option(self, select: Select, option: SelectOption) -> None:
+        return await self._state.http.select_option(self, select, option)
 
     async def edit(
         self,
@@ -75,7 +85,9 @@ class ComponentMessage(Message):
             data["content"] = content
 
         if embed is not None and embeds is not None:
-            raise InvalidArgument("cannot pass both embed and embeds parameter to edit()")
+            raise InvalidArgument(
+                "cannot pass both embed and embeds parameter to edit()"
+            )
 
         if embed is not None:
             data["embeds"] = [embed.to_dict()]
@@ -89,11 +101,16 @@ class ComponentMessage(Message):
             data["flags"] = flags.value
 
         if allowed_mentions is None:
-            if state.allowed_mentions is not None and self.author.id == self._state.self_id:
+            if (
+                state.allowed_mentions is not None
+                and self.author.id == self._state.self_id
+            ):
                 data["allowed_mentions"] = state.allowed_mentions.to_dict()
         else:
             if state.allowed_mentions is not None:
-                data["allowed_mentions"] = state.allowed_mentions.merge(allowed_mentions).to_dict()
+                data["allowed_mentions"] = state.allowed_mentions.merge(
+                    allowed_mentions
+                ).to_dict()
             else:
                 data["allowed_mentions"] = allowed_mentions.to_dict()
 
@@ -174,13 +191,43 @@ def send_files(
         files=files,
     )
 
+
 def click_button(self, msg: Message, button: Button):
-    route = Route("POST", '/interactions')
+    route = Route("POST", "/interactions")
     data = {"component_type": 2, "custom_id": str(button.id)}
-    values = {"application_id": "270904126974590976", "channel_id": str(msg.channel.id), "type": "3", "data": data,
-            "guild_id": str(msg.guild.id), "message_flags": 1, "message_id": str(msg.id)}
+    values = {
+        "application_id": str(msg.author.id),
+        "channel_id": str(msg.channel.id),
+        "type": "3",
+        "data": data,
+        "guild_id": str(msg.guild.id),
+        "message_flags": 1,
+        "message_id": str(msg.id),
+    }
 
     return self.request(route, json=values)
+
+
+def select_option(self, msg: Message, select: Select, option: SelectOption):
+    route = Route("POST", "/interactions")
+    data = {
+        "component_type": 3,
+        "custom_id": str(select.id),
+        "values": [str(option.value)],
+        "type": 3,
+    }
+    values = {
+        "application_id": str(msg.author.id),
+        "channel_id": str(msg.channel.id),
+        "type": "3",
+        "data": data,
+        "guild_id": str(msg.guild.id),
+        "message_flags": 0,
+        "message_id": str(msg.id),
+    }
+
+    return self.request(route, json=values)
+
 
 def send_message(
     self,
@@ -231,6 +278,7 @@ def send_message(
 HTTPClient.send_files = send_files
 HTTPClient.send_message = send_message
 HTTPClient.click_button = click_button
+HTTPClient.select_option = select_option
 
 
 async def send(
@@ -262,7 +310,9 @@ async def send(
 
     elif embeds is not None:
         if len(embeds) > 10:
-            raise InvalidArgument("embeds parameter must be a list of up to 10 elements")
+            raise InvalidArgument(
+                "embeds parameter must be a list of up to 10 elements"
+            )
         embeds = [embed.to_dict() for embed in embeds]
 
     if stickers is not None:
