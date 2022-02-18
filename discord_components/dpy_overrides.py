@@ -203,7 +203,7 @@ def click_button(self, msg: Message, button: Button):
         "guild_id": str(msg.guild.id),
         "message_flags": 1,
         "message_id": str(msg.id),
-        "session_id": str(self.session_id),
+        "session_id": str(msg.channel._state._get_websocket().session_id),
     }
 
     return self.request(route, json=values)
